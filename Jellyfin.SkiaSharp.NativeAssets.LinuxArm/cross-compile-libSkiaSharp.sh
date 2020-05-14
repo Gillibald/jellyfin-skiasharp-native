@@ -1,8 +1,13 @@
 #!/bin/bash
 
+skipSkia=1
+
 TOOLCHAIN_ARM64=gcc-linaro-4.9.4-2017.01-x86_64_aarch64-linux-gnu
 
 set -e
+if [ ! -d "harfbuzz" ] ; then
+    git clone https://github.com/harfbuzz/harfbuzz.git -b 2.6.1 --depth 1
+fi
 if [ ! -d "skia" ] ; then
     git clone https://github.com/mono/skia.git -b v1.68.1 --depth 1 skia
 fi
@@ -55,6 +60,16 @@ OLDPATH=$PATH
 
 export PATH="$PATH:`pwd`/tools/arm-bcm2708/arm-linux-gnueabihf/bin"
 
+pushd libHarfBuzzSharp
+
+echo "CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++"
+
+make ARCH=arm CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++
+
+popd
+
+if [ $skipSkia -eq 0 ] ; then
+
 pushd skia
 
 python tools/git-sync-deps
@@ -74,12 +89,25 @@ python tools/git-sync-deps
 ../depot_tools/ninja 'SkiaSharp' -C 'out/linux-arm'
 
 popd
+
+fi
+
+pushd libHarfBuzzSharp
+
+make ARCH=arm64 CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++
+
+popd
+
+if [ $skipSkia -eq 0 ] ; then
+
 export PATH="$OLDPATH:`pwd`/${TOOLCHAIN_ARM64}/bin"
 
 # Patch source if not already patched
 if ! patch -R -p0 -s -f --dry-run <patches/aarch64-skia-build-fix.patch; then
    patch -p0 -b <patches/aarch64-skia-build-fix.patch
 fi
+
+
 # Debian: apt install libjpeg62-turbo  libexpat1 libfreetype6 libpng16-16 libwebp6 zlib1g
 pushd skia
 
@@ -98,3 +126,5 @@ pushd skia
 ../depot_tools/ninja 'SkiaSharp' -C 'out/linux-arm64'
 
 popd
+
+fi
