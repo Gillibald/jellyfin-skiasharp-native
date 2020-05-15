@@ -10,7 +10,7 @@ space = ${noop} ${noop}
 
 src_root = ../harfbuzz/src
 obj_root = obj/${VARIANT}
-bin_root = bin/${VARIANT}
+bin_root = ../build/libHarfBuzzSharp/bin/${VARIANT}
 objarch_root = ${obj_root}/${ARCH}
 target_name = libHarfBuzzSharp.so
 target = ${bin_root}/${ARCH}/${target_name}.${SONAME_VERSION}
