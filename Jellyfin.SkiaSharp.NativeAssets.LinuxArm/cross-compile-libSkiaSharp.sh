@@ -94,7 +94,7 @@ fi
 
 pushd libHarfBuzzSharp
 
-make ARCH=arm64 CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++
+make ARCH=arm64 CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
 
 popd
 
